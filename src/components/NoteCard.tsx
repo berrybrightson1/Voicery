@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, Copy, Sparkles, X, Check } from "lucide-react";
+import { Trash2, Copy, Sparkles, X, Check, Play, Pause } from "lucide-react";
 import { useNotes, Note } from "@/context/NoteContext";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
@@ -19,7 +19,9 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
     const [text, setText] = useState(note.text);
     const [hintStep, setHintStep] = useState<number | null>(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
     // Load hint step from localStorage
     useEffect(() => {
@@ -163,6 +165,32 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
 
                     {/* Action Row */}
                     <div className="flex items-center gap-2 mt-4">
+                        {/* Play - Only if has audio */}
+                        {note.audioData && (
+                            <button
+                                onClick={() => {
+                                    if (isPlaying && audioRef.current) {
+                                        audioRef.current.pause();
+                                        setIsPlaying(false);
+                                    } else {
+                                        if (!audioRef.current) {
+                                            audioRef.current = new Audio(note.audioData);
+                                            audioRef.current.onended = () => setIsPlaying(false);
+                                        }
+                                        audioRef.current.play();
+                                        setIsPlaying(true);
+                                    }
+                                }}
+                                className={`flex items-center justify-center h-10 w-10 rounded-xl border transition-all active:scale-95 ${isPlaying
+                                        ? "bg-blue-500 border-blue-500 text-white"
+                                        : "bg-blue-50/50 border-blue-100 text-blue-500 hover:bg-blue-100 hover:border-blue-200"
+                                    }`}
+                                aria-label={isPlaying ? "Pause" : "Play"}
+                            >
+                                {isPlaying ? <Pause size={16} strokeWidth={1.5} /> : <Play size={16} strokeWidth={1.5} />}
+                            </button>
+                        )}
+
                         {/* Copy - Icon only */}
                         <button
                             onClick={handleCopy}

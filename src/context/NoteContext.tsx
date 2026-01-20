@@ -6,6 +6,7 @@ export type Note = {
     id: string;
     text: string;
     createdAt: Date;
+    audioData?: string; // base64 encoded audio
 };
 
 export type TrashedNote = Note & {
@@ -17,6 +18,7 @@ type StoredNote = {
     id: string;
     text: string;
     createdAt: string;
+    audioData?: string;
 };
 
 type StoredTrashedNote = StoredNote & {
@@ -26,7 +28,7 @@ type StoredTrashedNote = StoredNote & {
 interface NoteContextType {
     notes: Note[];
     trash: TrashedNote[];
-    addNote: (text: string) => void;
+    addNote: (text: string, audioData?: string) => void;
     updateNote: (id: string, text: string) => void;
     deleteNote: (id: string) => void;
     clearAllNotes: () => void;
@@ -137,11 +139,12 @@ export function NoteProvider({ children }: { children: ReactNode }) {
         return () => clearInterval(interval);
     }, []);
 
-    const addNote = useCallback((text: string) => {
+    const addNote = useCallback((text: string, audioData?: string) => {
         const newNote: Note = {
             id: crypto.randomUUID(),
             text,
             createdAt: new Date(),
+            audioData,
         };
         setNotes((prev) => [newNote, ...prev]);
     }, []);

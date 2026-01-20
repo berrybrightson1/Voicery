@@ -17,6 +17,7 @@ export function useMobileSpeech() {
     const [volume, setVolume] = useState<number>(0);
     const [isSupported, setIsSupported] = useState(false);
     const [isIOS, setIsIOS] = useState(false);
+    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
     useEffect(() => {
         setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
@@ -27,13 +28,14 @@ export function useMobileSpeech() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recognitionRef = useRef<any>(null);
     const visualizerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+    const mediaStreamRef = useRef<MediaStream | null>(null);
 
     const startVisualizer = useCallback(() => {
         if (visualizerIntervalRef.current) clearInterval(visualizerIntervalRef.current);
-
-        // Simulate volume fluctuations (0-100)
         visualizerIntervalRef.current = setInterval(() => {
-            setVolume(Math.random() * 60 + 20); // Random interactions between 20-80
+            setVolume(Math.random() * 60 + 20);
         }, 100);
     }, []);
 
@@ -66,12 +68,10 @@ export function useMobileSpeech() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             recognition.onerror = (event: any) => {
                 if (event.error === "no-speech") {
-                    console.debug("Speech recognition: no speech detected");
                     toast.error("No speech detected. Please try again.");
                     return;
                 }
                 if (event.error === "network") {
-                    console.debug("Speech recognition: network error");
                     toast.error("Network error. Check your connection or try a different browser.");
                     return;
                 }
@@ -92,10 +92,46 @@ export function useMobileSpeech() {
         }
     }, [stopVisualizer]);
 
-    // Permissive Start
-    // Permissive Start
-    const start = useCallback(() => {
-        // 1. Check Security (HTTPS is required for Web Speech API)
+    const startAudioRecording = useCallback(async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaStreamRef.current = stream;
+            audioChunksRef.current = [];
+
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
+            });
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
+                setAudioBlob(blob);
+                // Stop all tracks
+                if (mediaStreamRef.current) {
+                    mediaStreamRef.current.getTracks().forEach(track => track.stop());
+                }
+            };
+
+            mediaRecorderRef.current = mediaRecorder;
+            mediaRecorder.start();
+        } catch (error) {
+            console.error("Audio recording error:", error);
+            // Don't show error - audio recording is optional, speech still works
+        }
+    }, []);
+
+    const stopAudioRecording = useCallback(() => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+            mediaRecorderRef.current.stop();
+        }
+    }, []);
+
+    const start = useCallback(async () => {
         if (typeof window !== "undefined" && !window.isSecureContext) {
             toast.error("Security Restriction", {
                 description: "Voice input requires HTTPS. It will not work on local IP addresses."
@@ -112,20 +148,23 @@ export function useMobileSpeech() {
 
         try {
             setTranscript("");
+            setAudioBlob(null);
+
+            // Start audio recording first
+            await startAudioRecording();
+
+            // Then start speech recognition
             recognitionRef.current.start();
-            // isListening sets in onstart
             startVisualizer();
         } catch (error) {
             console.error("Speech start error:", error);
-
-            // Handle iOS specifically if it throws synchronously
             if (isIOS) {
                 toast.error("Voice input failed", {
                     description: "Please tap the mic again or try Safari."
-                })
+                });
             }
         }
-    }, [isIOS, startVisualizer]);
+    }, [isIOS, startVisualizer, startAudioRecording]);
 
     const stop = useCallback(() => {
         if (recognitionRef.current) {
@@ -135,16 +174,19 @@ export function useMobileSpeech() {
                 // ignore
             }
         }
-        stopVisualizer(); // Ensure visualizer stops immediately
-    }, [stopVisualizer]);
+        stopAudioRecording();
+        stopVisualizer();
+    }, [stopVisualizer, stopAudioRecording]);
 
     return {
         isListening,
         transcript,
-        start, // Renamed from startListening
-        stop,  // Renamed from stopListening
+        start,
+        stop,
         volume,
         isSupported,
-        isIOS
+        isIOS,
+        audioBlob,
     };
 }
+
