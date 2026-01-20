@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
+import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 
 export type Note = {
     id: string;
@@ -20,8 +20,22 @@ interface NoteContextType {
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
+const ONE_HOUR_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+
 export function NoteProvider({ children }: { children: ReactNode }) {
     const [notes, setNotes] = useState<Note[]>([]);
+
+    // Auto-delete notes older than 1 hour
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = Date.now();
+            setNotes((prev) =>
+                prev.filter((note) => now - note.createdAt.getTime() < ONE_HOUR_MS)
+            );
+        }, 60000); // Check every minute
+
+        return () => clearInterval(interval);
+    }, []);
 
     const addNote = useCallback((text: string) => {
         const newNote: Note = {

@@ -3,6 +3,7 @@
 import { TopBar } from "@/components/TopBar";
 import { NoteFeed } from "@/components/NoteFeed";
 import { BottomControls } from "@/components/BottomControls";
+import { Onboarding } from "@/components/Onboarding";
 import { useMobileSpeech } from "@/hooks/useMobileSpeech";
 import { useNotes } from "@/context/NoteContext";
 import { useEffect, useRef } from "react";
@@ -36,6 +37,7 @@ export default function Home() {
 
   return (
     <main className="flex h-screen flex-col bg-gray-50 overflow-hidden relative">
+      <Onboarding />
       <TopBar />
       <NoteFeed />
 
