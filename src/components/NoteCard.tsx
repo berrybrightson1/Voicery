@@ -5,6 +5,7 @@ import { Trash2, Copy, Sparkles, X, Check, Play, Pause } from "lucide-react";
 import { useNotes, Note } from "@/context/NoteContext";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { TagPicker, TagBadge } from "./TagPicker";
 
 const HINT_STEP_KEY = "voicery-hint-step"; // 0 = show edit, 1 = show refine, 2 = done
 
@@ -14,7 +15,7 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
-    const { updateNote, deleteNote, restoreNote } = useNotes();
+    const { updateNote, updateNoteTag, deleteNote, restoreNote } = useNotes();
     const [isEditing, setIsEditing] = useState(false);
     const [text, setText] = useState(note.text);
     const [hintStep, setHintStep] = useState<number | null>(null);
@@ -156,6 +157,13 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                         )}
                     </AnimatePresence>
 
+                    {/* Tag Badge */}
+                    {note.tag && (
+                        <div className="mb-2">
+                            <TagBadge tag={note.tag} />
+                        </div>
+                    )}
+
                     <p
                         onClick={handleStartEdit}
                         className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap cursor-text font-sans break-words hover:bg-gray-50/50 rounded-lg -m-1 p-1 transition-colors"
@@ -182,8 +190,8 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                                     }
                                 }}
                                 className={`flex items-center justify-center h-10 w-10 rounded-xl border transition-all active:scale-95 ${isPlaying
-                                        ? "bg-blue-500 border-blue-500 text-white"
-                                        : "bg-blue-50/50 border-blue-100 text-blue-500 hover:bg-blue-100 hover:border-blue-200"
+                                    ? "bg-blue-500 border-blue-500 text-white"
+                                    : "bg-blue-50/50 border-blue-100 text-blue-500 hover:bg-blue-100 hover:border-blue-200"
                                     }`}
                                 aria-label={isPlaying ? "Pause" : "Play"}
                             >
@@ -263,6 +271,12 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                                 <Trash2 size={14} strokeWidth={1.5} />
                             </button>
                         )}
+
+                        {/* Tag Picker */}
+                        <TagPicker
+                            currentTag={note.tag}
+                            onSelect={(tag) => updateNoteTag(note.id, tag)}
+                        />
                     </div>
                 </>
             )}

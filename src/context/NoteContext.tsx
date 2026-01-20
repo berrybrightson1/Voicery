@@ -2,11 +2,14 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from "react";
 
+export type NoteTag = "idea" | "task" | "personal" | "work";
+
 export type Note = {
     id: string;
     text: string;
     createdAt: Date;
-    audioData?: string; // base64 encoded audio
+    audioData?: string;
+    tag?: NoteTag;
 };
 
 export type TrashedNote = Note & {
@@ -19,6 +22,7 @@ type StoredNote = {
     text: string;
     createdAt: string;
     audioData?: string;
+    tag?: NoteTag;
 };
 
 type StoredTrashedNote = StoredNote & {
@@ -30,6 +34,7 @@ interface NoteContextType {
     trash: TrashedNote[];
     addNote: (text: string, audioData?: string) => void;
     updateNote: (id: string, text: string) => void;
+    updateNoteTag: (id: string, tag: NoteTag | null) => void;
     deleteNote: (id: string) => void;
     clearAllNotes: () => void;
     restoreNote: (note: Note) => void;
@@ -155,6 +160,12 @@ export function NoteProvider({ children }: { children: ReactNode }) {
         );
     }, []);
 
+    const updateNoteTag = useCallback((id: string, tag: NoteTag | null) => {
+        setNotes((prev) =>
+            prev.map((note) => (note.id === id ? { ...note, tag: tag || undefined } : note))
+        );
+    }, []);
+
     const deleteNote = useCallback((id: string) => {
         setNotes((prev) => {
             const noteToDelete = prev.find((n) => n.id === id);
@@ -211,6 +222,7 @@ export function NoteProvider({ children }: { children: ReactNode }) {
                 trash,
                 addNote,
                 updateNote,
+                updateNoteTag,
                 deleteNote,
                 clearAllNotes,
                 restoreNote,
