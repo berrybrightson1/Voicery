@@ -18,6 +18,7 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [text, setText] = useState(note.text);
     const [hintStep, setHintStep] = useState<number | null>(null);
+    const [confirmDelete, setConfirmDelete] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Load hint step from localStorage
@@ -206,14 +207,28 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                             </AnimatePresence>
                         </div>
 
-                        {/* Delete - Smaller icon */}
-                        <button
-                            onClick={() => deleteNote(note.id)}
-                            className="flex items-center justify-center h-10 w-10 rounded-xl border bg-red-50/30 border-red-100/50 text-red-300 hover:bg-red-100/80 hover:border-red-200 hover:text-red-500 transition-all active:scale-95"
-                            aria-label="Delete"
-                        >
-                            <Trash2 size={14} strokeWidth={1.5} />
-                        </button>
+                        {/* Delete - Confirmation flow */}
+                        {confirmDelete ? (
+                            <button
+                                onClick={() => {
+                                    deleteNote(note.id);
+                                    toast.success("Note deleted");
+                                }}
+                                className="flex items-center justify-center gap-1 h-10 px-3 rounded-xl border bg-red-500 border-red-500 text-white hover:bg-red-600 transition-all active:scale-95"
+                                aria-label="Confirm delete"
+                            >
+                                <Trash2 size={14} strokeWidth={1.5} />
+                                <span className="text-xs font-medium">Delete?</span>
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => setConfirmDelete(true)}
+                                className="flex items-center justify-center h-10 w-10 rounded-xl border bg-red-50/30 border-red-100/50 text-red-300 hover:bg-red-100/80 hover:border-red-200 hover:text-red-500 transition-all active:scale-95"
+                                aria-label="Delete"
+                            >
+                                <Trash2 size={14} strokeWidth={1.5} />
+                            </button>
+                        )}
                     </div>
                 </>
             )}
