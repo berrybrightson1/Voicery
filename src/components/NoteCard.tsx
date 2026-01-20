@@ -4,10 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Copy, Sparkles, X, Check } from "lucide-react";
 import { useNotes, Note } from "@/context/NoteContext";
 import { useState, useRef, useEffect } from "react";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const EDIT_HINT_KEY = "voicery-edit-hint-shown";
+const HINT_STEP_KEY = "voicery-hint-step"; // 0 = show edit, 1 = show refine, 2 = done
 
 interface NoteCardProps {
     note: Note;
@@ -18,22 +17,30 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
     const { updateNote, deleteNote } = useNotes();
     const [isEditing, setIsEditing] = useState(false);
     const [text, setText] = useState(note.text);
-    const [showEditHint, setShowEditHint] = useState(false);
+    const [hintStep, setHintStep] = useState<number | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // Show edit hint on first note (once ever)
+    // Load hint step from localStorage
     useEffect(() => {
-        if (isFirstNote && !localStorage.getItem(EDIT_HINT_KEY)) {
-            const timer = setTimeout(() => {
-                setShowEditHint(true);
-            }, 1500); // Show after 1.5s
-            return () => clearTimeout(timer);
+        if (isFirstNote) {
+            const stored = localStorage.getItem(HINT_STEP_KEY);
+            const step = stored ? parseInt(stored, 10) : 0;
+            if (step < 2) {
+                // Show hint after a short delay
+                const timer = setTimeout(() => setHintStep(step), 800);
+                return () => clearTimeout(timer);
+            }
         }
     }, [isFirstNote]);
 
-    const dismissEditHint = () => {
-        localStorage.setItem(EDIT_HINT_KEY, "true");
-        setShowEditHint(false);
+    const advanceHint = () => {
+        const nextStep = (hintStep ?? 0) + 1;
+        localStorage.setItem(HINT_STEP_KEY, String(nextStep));
+        if (nextStep < 2) {
+            setHintStep(nextStep);
+        } else {
+            setHintStep(null);
+        }
     };
 
     // Focus textarea on edit
@@ -69,10 +76,17 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
         toast.success("Prompt copied", {
             description: "Paste into ChatGPT/Claude to refine."
         });
+        // If refine hint is showing, dismiss it
+        if (hintStep === 1) {
+            advanceHint();
+        }
     };
 
     const handleStartEdit = () => {
-        dismissEditHint();
+        // If edit hint is showing, advance to refine hint
+        if (hintStep === 0) {
+            advanceHint();
+        }
         setIsEditing(true);
     };
 
@@ -82,7 +96,7 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-            className="group relative bg-white rounded-2xl border border-gray-200 p-5 shadow-sm transition-all hover:shadow-md"
+            className="group relative bg-white rounded-2xl border border-gray-200 p-5 shadow-sm transition-all hover:shadow-md overflow-visible"
         >
             {isEditing ? (
                 <div className="space-y-4">
@@ -116,26 +130,25 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                 </div>
             ) : (
                 <>
-                    {/* Edit Hint Popup */}
+                    {/* Edit Hint - positioned above text */}
                     <AnimatePresence>
-                        {showEditHint && (
+                        {hintStep === 0 && (
                             <motion.div
-                                initial={{ opacity: 0, y: -10 }}
+                                initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="absolute -top-12 left-1/2 -translate-x-1/2 z-10"
+                                exit={{ opacity: 0, y: 5 }}
+                                className="mb-3"
                             >
-                                <div className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-2">
-                                    <span>Tap text to edit</span>
+                                <div className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg inline-flex items-center gap-2">
+                                    <span>👆 Tap the text to edit it</span>
                                     <button
-                                        onClick={dismissEditHint}
-                                        className="text-gray-400 hover:text-white"
-                                        title="Dismiss"
+                                        onClick={advanceHint}
+                                        className="text-gray-400 hover:text-white ml-1"
+                                        title="Got it"
                                     >
                                         <X size={14} />
                                     </button>
                                 </div>
-                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-gray-900 rotate-45" />
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -159,14 +172,39 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                         </button>
 
                         {/* Refine - Label + Icon */}
-                        <button
-                            onClick={handleRefine}
-                            className="flex items-center justify-center gap-2 h-10 px-4 rounded-xl border bg-purple-50/50 border-purple-100 text-purple-600 hover:bg-purple-100 hover:border-purple-200 hover:text-purple-700 transition-all active:scale-95 flex-1"
-                            aria-label="Refine for AI"
-                        >
-                            <Sparkles size={16} strokeWidth={1.5} />
-                            <span className="text-sm font-medium">Refine</span>
-                        </button>
+                        <div className="relative flex-1">
+                            <button
+                                onClick={handleRefine}
+                                className="flex items-center justify-center gap-2 h-10 px-4 rounded-xl border bg-purple-50/50 border-purple-100 text-purple-600 hover:bg-purple-100 hover:border-purple-200 hover:text-purple-700 transition-all active:scale-95 w-full"
+                                aria-label="Refine for AI"
+                            >
+                                <Sparkles size={16} strokeWidth={1.5} />
+                                <span className="text-sm font-medium">Refine</span>
+                            </button>
+
+                            {/* Refine Hint */}
+                            <AnimatePresence>
+                                {hintStep === 1 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 5 }}
+                                        className="absolute -bottom-14 left-0 right-0 z-10"
+                                    >
+                                        <div className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg flex items-center gap-2">
+                                            <span>✨ Tap Refine to copy as AI prompt</span>
+                                            <button
+                                                onClick={advanceHint}
+                                                className="text-gray-400 hover:text-white ml-auto"
+                                                title="Got it"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
                         {/* Delete - Smaller icon */}
                         <button
@@ -182,4 +220,5 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
         </motion.div>
     );
 }
+
 
