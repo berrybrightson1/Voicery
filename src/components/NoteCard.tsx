@@ -14,7 +14,7 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
-    const { updateNote, deleteNote } = useNotes();
+    const { updateNote, deleteNote, restoreNote } = useNotes();
     const [isEditing, setIsEditing] = useState(false);
     const [text, setText] = useState(note.text);
     const [hintStep, setHintStep] = useState<number | null>(null);
@@ -211,8 +211,14 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                         {confirmDelete ? (
                             <button
                                 onClick={() => {
+                                    const deletedNote = { ...note };
                                     deleteNote(note.id);
-                                    toast.success("Note deleted");
+                                    toast.success("Note deleted", {
+                                        action: {
+                                            label: "Undo",
+                                            onClick: () => restoreNote(deletedNote)
+                                        }
+                                    });
                                 }}
                                 className="flex items-center justify-center gap-1 h-10 px-3 rounded-xl border bg-red-500 border-red-500 text-white hover:bg-red-600 transition-all active:scale-95"
                                 aria-label="Confirm delete"
