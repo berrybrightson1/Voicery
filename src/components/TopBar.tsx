@@ -1,23 +1,9 @@
 import Link from "next/link";
 import { Trash2, Info } from "lucide-react";
 import { useNotes } from "@/context/NoteContext";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 export function TopBar() {
-    const { notes, clearAllNotes, replaceNotes } = useNotes();
-
-    const handleClear = () => {
-        if (notes.length === 0) return;
-        const oldNotes = [...notes];
-        clearAllNotes();
-        toast.success("All notes cleared", {
-            action: {
-                label: "Undo",
-                onClick: () => replaceNotes(oldNotes),
-            },
-        });
-    };
+    const { trash } = useNotes();
 
     return (
         <header className="fixed top-0 left-0 right-0 h-20 z-50 flex items-center justify-between px-6 max-w-md mx-auto w-full transition-all bg-white/80 backdrop-blur-xl border-b border-gray-100/50">
@@ -32,14 +18,20 @@ export function TopBar() {
                     <Info size={22} strokeWidth={1.5} />
                 </Link>
 
-                <button
-                    onClick={handleClear}
-                    className="flex items-center justify-center w-10 h-10 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-200 active:scale-95"
-                    aria-label="Clear all notes"
+                <Link
+                    href="/trash"
+                    className="relative flex items-center justify-center w-10 h-10 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95"
+                    aria-label="Recently deleted"
                 >
                     <Trash2 size={22} strokeWidth={1.5} />
-                </button>
+                    {trash.length > 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                            {trash.length > 9 ? "9+" : trash.length}
+                        </span>
+                    )}
+                </Link>
             </div>
         </header>
     );
 }
+
