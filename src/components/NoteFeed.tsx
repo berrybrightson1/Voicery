@@ -33,8 +33,8 @@ export function NoteFeed() {
                     </motion.div>
                 ) : (
                     <div className="flex flex-col gap-4">
-                        {notes.map((note) => (
-                            <NoteCard key={note.id} note={note} />
+                        {notes.map((note, index) => (
+                            <NoteCard key={note.id} note={note} isFirstNote={index === 0} />
                         ))}
 
                         {notes.length > 1 && (

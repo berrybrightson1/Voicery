@@ -1,37 +1,49 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Trash2, Copy, Sparkles, X, Check, Share2 } from "lucide-react"; // Share2 kept if we want it, but replacing with Sparkles as verified.
+import { motion, AnimatePresence } from "framer-motion";
+import { Trash2, Copy, Sparkles, X, Check } from "lucide-react";
 import { useNotes, Note } from "@/context/NoteContext";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
+const EDIT_HINT_KEY = "voicery-edit-hint-shown";
+
 interface NoteCardProps {
     note: Note;
+    isFirstNote?: boolean;
 }
 
-export function NoteCard({ note }: NoteCardProps) {
+export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
     const { updateNote, deleteNote } = useNotes();
     const [isEditing, setIsEditing] = useState(false);
     const [text, setText] = useState(note.text);
+    const [showEditHint, setShowEditHint] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // Show edit hint on first note (once ever)
+    useEffect(() => {
+        if (isFirstNote && !localStorage.getItem(EDIT_HINT_KEY)) {
+            const timer = setTimeout(() => {
+                setShowEditHint(true);
+            }, 1500); // Show after 1.5s
+            return () => clearTimeout(timer);
+        }
+    }, [isFirstNote]);
+
+    const dismissEditHint = () => {
+        localStorage.setItem(EDIT_HINT_KEY, "true");
+        setShowEditHint(false);
+    };
 
     // Focus textarea on edit
     useEffect(() => {
         if (isEditing && textareaRef.current) {
             textareaRef.current.focus();
-            // Reset height
             textareaRef.current.style.height = "auto";
             textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
         }
     }, [isEditing]);
-
-    const handleBlur = () => {
-        // No auto-save anymore, explicit save only. 
-        // Although standard UX might expect blur to save, user asked for explicit buttons.
-        // We will keep blur doing nothing to allow 'Cancel'.
-    };
 
     const handleSave = () => {
         if (text.trim() !== note.text) {
@@ -42,26 +54,8 @@ export function NoteCard({ note }: NoteCardProps) {
     };
 
     const handleCancel = () => {
-        setText(note.text); // Revert
+        setText(note.text);
         setIsEditing(false);
-    };
-
-    const handleDelete = () => {
-        deleteNote(note.id);
-        toast.success("Note deleted", {
-            action: {
-                label: "Undo",
-                onClick: () => {
-                    // Restore logic handled in context, but we need to pass the note object
-                    // Context currently handles restoring if we had a restore function exposing it properly.
-                    // For now, simpler to just re-add? No, context has restoreNote.
-                    // We need to import restoreNote from context or just let context handle usage.
-                }
-            }
-        });
-        // Actually, restoreNote needs to be called. We can do that if we pull it from hook.
-        // But for this snippet let's stick to simple delete toast. 
-        // Ideally we pass restoreNote from parent or hook.
     };
 
     const handleCopy = () => {
@@ -75,6 +69,11 @@ export function NoteCard({ note }: NoteCardProps) {
         toast.success("Prompt copied", {
             description: "Paste into ChatGPT/Claude to refine."
         });
+    };
+
+    const handleStartEdit = () => {
+        dismissEditHint();
+        setIsEditing(true);
     };
 
     return (
@@ -117,18 +116,66 @@ export function NoteCard({ note }: NoteCardProps) {
                 </div>
             ) : (
                 <>
+                    {/* Edit Hint Popup */}
+                    <AnimatePresence>
+                        {showEditHint && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="absolute -top-12 left-1/2 -translate-x-1/2 z-10"
+                            >
+                                <div className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-2">
+                                    <span>Tap text to edit</span>
+                                    <button
+                                        onClick={dismissEditHint}
+                                        className="text-gray-400 hover:text-white"
+                                        title="Dismiss"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                                <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-gray-900 rotate-45" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     <p
-                        onClick={() => setIsEditing(true)}
+                        onClick={handleStartEdit}
                         className="text-lg text-gray-900 leading-relaxed whitespace-pre-wrap cursor-text font-sans break-words hover:bg-gray-50/50 rounded-lg -m-1 p-1 transition-colors"
                     >
                         {note.text}
                     </p>
 
                     {/* Action Row */}
-                    <div className="grid grid-cols-3 gap-2 mt-4">
-                        <ActionButton icon={Copy} onClick={handleCopy} label="Copy" />
-                        <ActionButton icon={Sparkles} onClick={handleRefine} label="Refine Prompt" />
-                        <ActionButton icon={Trash2} onClick={() => deleteNote(note.id)} label="Delete" isDestructive />
+                    <div className="flex items-center gap-2 mt-4">
+                        {/* Copy - Icon only */}
+                        <button
+                            onClick={handleCopy}
+                            className="flex items-center justify-center h-10 px-4 rounded-xl border bg-gray-50/50 border-gray-100 text-gray-500 hover:bg-gray-100 hover:border-gray-200 hover:text-gray-900 transition-all active:scale-95"
+                            aria-label="Copy"
+                        >
+                            <Copy size={18} strokeWidth={1.5} />
+                        </button>
+
+                        {/* Refine - Label + Icon */}
+                        <button
+                            onClick={handleRefine}
+                            className="flex items-center justify-center gap-2 h-10 px-4 rounded-xl border bg-purple-50/50 border-purple-100 text-purple-600 hover:bg-purple-100 hover:border-purple-200 hover:text-purple-700 transition-all active:scale-95 flex-1"
+                            aria-label="Refine for AI"
+                        >
+                            <Sparkles size={16} strokeWidth={1.5} />
+                            <span className="text-sm font-medium">Refine</span>
+                        </button>
+
+                        {/* Delete - Smaller icon */}
+                        <button
+                            onClick={() => deleteNote(note.id)}
+                            className="flex items-center justify-center h-10 w-10 rounded-xl border bg-red-50/30 border-red-100/50 text-red-300 hover:bg-red-100/80 hover:border-red-200 hover:text-red-500 transition-all active:scale-95"
+                            aria-label="Delete"
+                        >
+                            <Trash2 size={14} strokeWidth={1.5} />
+                        </button>
                     </div>
                 </>
             )}
@@ -136,20 +183,3 @@ export function NoteCard({ note }: NoteCardProps) {
     );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ActionButton({ icon: Icon, onClick, label, isDestructive }: any) {
-    return (
-        <button
-            onClick={onClick}
-            className={cn(
-                "group/btn flex items-center justify-center w-full h-10 rounded-xl border transition-all duration-200 active:scale-95",
-                isDestructive
-                    ? "bg-red-50/50 border-red-100/50 text-red-400 hover:bg-red-100/80 hover:border-red-200 hover:text-red-500"
-                    : "bg-gray-50/50 border-gray-100 text-gray-500 hover:bg-gray-100 hover:border-gray-200 hover:text-gray-900"
-            )}
-            aria-label={label}
-        >
-            <Icon size={18} strokeWidth={1.5} />
-        </button>
-    )
-}

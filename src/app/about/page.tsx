@@ -25,16 +25,12 @@ export default function AboutPage() {
                     {/* How it Works */}
                     <section className="space-y-4">
                         <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">How it Works</h2>
-                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-4">
-                            <p className="leading-relaxed text-gray-700">
-                                <span className="font-semibold text-gray-900">Voicery is ephemeral.</span> We prefer to call it a "Thought Catcher" rather than a note-taking app.
-                            </p>
-                            <p className="leading-relaxed text-gray-700">
-                                Data lives <strong>only in your browser's memory</strong>. There is no database, no login, and no cloud sync.
-                            </p>
-                            <p className="leading-relaxed text-gray-700">
-                                When you refresh the page or close the tab, your notes vanish forever. Use it to capture fleeting ideas, then copy them elsewhere.
-                            </p>
+                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                            <ul className="space-y-3 text-gray-700">
+                                <li>• Tap the mic to record</li>
+                                <li>• Notes stay for <strong>1 hour</strong>, then vanish</li>
+                                <li>• Tap text to edit, use Refine for AI prompts</li>
+                            </ul>
                         </div>
                     </section>
 
