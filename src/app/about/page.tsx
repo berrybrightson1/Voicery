@@ -38,6 +38,16 @@ export default function AboutPage() {
                         </div>
                     </section>
 
+                    {/* Common Uses */}
+                    <section className="space-y-4">
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">Common Uses</h2>
+                        <div className="grid grid-cols-1 gap-4">
+                            <UseItem title="Walking & Talking" desc="Capture streams of consciousness while on a walk." />
+                            <UseItem title="Rubber Ducking" desc="Speak to untangle complex thoughts or coding problems." />
+                            <UseItem title="AI Drafting" desc="Ramble your thoughts, then use 'Refine' (Sparkles) to prep them for ChatGPT." />
+                        </div>
+                    </section>
+
                     {/* Patch Notes */}
                     <section className="space-y-6">
                         <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">Patch Notes</h2>
@@ -77,4 +87,13 @@ function PatchItem({ text }: { text: string }) {
             <span className="leading-normal">{text}</span>
         </li>
     );
+}
+
+function UseItem({ title, desc }: { title: string, desc: string }) {
+    return (
+        <div className="bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
+            <h3 className="font-semibold text-gray-900 mb-1">{title}</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">{desc}</p>
+        </div>
+    )
 }
