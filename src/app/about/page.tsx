@@ -22,14 +22,24 @@ export default function AboutPage() {
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-10 pb-20">
 
+                    {/* What is Voicery */}
+                    <section className="space-y-4">
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">What is Voicery?</h2>
+                        <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white">
+                            <p className="text-lg font-medium leading-relaxed">
+                                A voice-first thought catcher. Speak your ideas, edit them, and refine them for AI — all in your browser.
+                            </p>
+                        </div>
+                    </section>
+
                     {/* How it Works */}
                     <section className="space-y-4">
                         <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400">How it Works</h2>
                         <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                             <ul className="space-y-3 text-gray-700">
                                 <li>• Tap the mic to record</li>
-                                <li>• Notes stay for <strong>1 hour</strong>, then vanish</li>
-                                <li>• Tap text to edit, use Refine for AI prompts</li>
+                                <li>• Notes persist for <strong>1 hour</strong>, even after refresh</li>
+                                <li>• Tap text to edit, tap <strong>Refine</strong> for AI prompts</li>
                             </ul>
                         </div>
                     </section>
@@ -40,7 +50,7 @@ export default function AboutPage() {
                         <div className="grid grid-cols-1 gap-4">
                             <UseItem title="Walking & Talking" desc="Capture streams of consciousness while on a walk." />
                             <UseItem title="Rubber Ducking" desc="Speak to untangle complex thoughts or coding problems." />
-                            <UseItem title="AI Drafting" desc="Ramble your thoughts, then use 'Refine' (Sparkles) to prep them for ChatGPT." />
+                            <UseItem title="AI Drafting" desc="Ramble your thoughts, then use Refine to prep them for ChatGPT." />
                         </div>
                     </section>
 
@@ -50,13 +60,26 @@ export default function AboutPage() {
 
                         <div className="space-y-2">
                             <div className="flex items-baseline justify-between">
-                                <h3 className="font-bold text-lg text-gray-900">v1.0.0</h3>
+                                <h3 className="font-bold text-lg text-gray-900">v1.1.0</h3>
                                 <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-1 rounded-full">Current</span>
                             </div>
+                            <p className="text-sm text-gray-500 pb-2">Released Jan 21, 2026</p>
+
+                            <ul className="space-y-3">
+                                <PatchItem text="1-hour note persistence (survives refresh)" />
+                                <PatchItem text="Refine button for AI-ready prompts" />
+                                <PatchItem text="Sequential onboarding hints for new users" />
+                                <PatchItem text="Tap-to-edit with explicit Save/Cancel" />
+                                <PatchItem text="Simplified About page" />
+                            </ul>
+                        </div>
+
+                        <div className="space-y-2 pt-4 border-t border-gray-100">
+                            <h3 className="font-bold text-lg text-gray-900">v1.0.0</h3>
                             <p className="text-sm text-gray-500 pb-2">Released Jan 20, 2026</p>
 
                             <ul className="space-y-3">
-                                <PatchItem text="High Contrast UI for better visibility" />
+                                <PatchItem text="High Contrast UI" />
                                 <PatchItem text="Simplified Control Bar" />
                                 <PatchItem text="Responsive Audio Visualizer" />
                                 <PatchItem text="Smart 'Copy All' functionality" />
