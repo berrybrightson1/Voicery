@@ -190,8 +190,8 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                                     }
                                 }}
                                 className={`flex-shrink-0 flex items-center justify-center gap-1 h-9 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${isPlaying
-                                        ? "bg-blue-500 text-white shadow-sm"
-                                        : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                    ? "bg-blue-500 text-white shadow-sm"
+                                    : "bg-blue-50 text-blue-600 hover:bg-blue-100"
                                     }`}
                                 aria-label={isPlaying ? "Pause" : "Play"}
                             >
@@ -203,20 +203,20 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                         {/* Copy */}
                         <button
                             onClick={handleCopy}
-                            className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-lg bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all active:scale-95 border border-gray-100/50"
+                            className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-lg bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all active:scale-95 border border-gray-100/50 shadow-sm"
                             aria-label="Copy"
                         >
-                            <Copy size={16} />
+                            <Copy size={14} />
                         </button>
 
                         {/* Refine */}
                         <div className="relative flex-1">
                             <button
                                 onClick={handleRefine}
-                                className="flex items-center justify-center gap-1.5 h-9 px-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all active:scale-95 w-full text-[10px] font-bold uppercase tracking-wider border border-purple-100/50"
+                                className="flex items-center justify-center gap-1.5 h-9 px-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all active:scale-95 w-full text-[10px] font-bold uppercase tracking-wider border border-purple-100/50 shadow-sm"
                                 aria-label="Refine for AI"
                             >
-                                <Sparkles size={12} />
+                                <Sparkles size={14} />
                                 <span>Refine</span>
                             </button>
 
@@ -269,16 +269,16 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                                     className="flex items-center gap-1 h-9 px-2.5 rounded-lg bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-red-600 transition-all active:scale-95 shadow-sm"
                                     aria-label="Confirm delete"
                                 >
-                                    <Trash2 size={12} />
+                                    <Trash2 size={14} />
                                     <span>Delete?</span>
                                 </button>
                             ) : (
                                 <button
                                     onClick={() => setConfirmDelete(true)}
-                                    className="flex items-center justify-center h-9 w-9 rounded-lg bg-white text-gray-300 hover:bg-red-50 hover:text-red-400 border border-gray-100/50 transition-all active:scale-95"
+                                    className="flex items-center justify-center h-9 w-9 rounded-lg bg-white text-gray-300 hover:bg-red-50 hover:text-red-400 border border-gray-100/50 transition-all active:scale-95 shadow-sm"
                                     aria-label="Delete"
                                 >
-                                    <Trash2 size={16} />
+                                    <Trash2 size={14} />
                                 </button>
                             )}
                         </div>

@@ -26,13 +26,13 @@ export function TagPicker({ currentTag, onSelect }: TagPickerProps) {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${selectedTag
-                        ? `${selectedTag.bg} ${selectedTag.color}`
-                        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                className={`flex items-center gap-1.5 h-9 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${selectedTag
+                    ? `${selectedTag.bg} ${selectedTag.color} border-transparent`
+                    : "bg-white text-gray-400 border-gray-100/50 hover:bg-gray-50 hover:text-gray-600 shadow-sm"
                     }`}
             >
-                <Tag size={12} />
-                {selectedTag ? selectedTag.label : "Tag"}
+                <Tag size={14} />
+                <span>{selectedTag ? selectedTag.label : "Tag"}</span>
             </button>
 
             <AnimatePresence>
@@ -51,8 +51,8 @@ export function TagPicker({ currentTag, onSelect }: TagPickerProps) {
                                     setIsOpen(false);
                                 }}
                                 className={`flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${currentTag === tag.id
-                                        ? `${tag.bg} ${tag.color}`
-                                        : "hover:bg-gray-50 text-gray-700"
+                                    ? `${tag.bg} ${tag.color}`
+                                    : "hover:bg-gray-50 text-gray-700"
                                     }`}
                             >
                                 <span className={`w-2 h-2 rounded-full ${tag.bg}`} />
@@ -66,7 +66,7 @@ export function TagPicker({ currentTag, onSelect }: TagPickerProps) {
                                     onSelect(null);
                                     setIsOpen(false);
                                 }}
-                                className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 mt-1 border-t border-gray-100 pt-2"
+                                className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider text-red-500 hover:bg-red-50 mt-1 border-t border-gray-100 pt-2 whitespace-nowrap"
                             >
                                 <X size={12} />
                                 Remove tag
