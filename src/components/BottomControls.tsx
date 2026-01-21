@@ -20,7 +20,6 @@ export function BottomControls({ isListening, onToggle, volume }: BottomControls
                 ))}
             </div>
 
-            { /* Record Button */}
             <motion.button
                 whileTap={{ scale: 0.92 }}
                 onClick={onToggle}
@@ -41,6 +40,17 @@ export function BottomControls({ isListening, onToggle, volume }: BottomControls
                     <Mic size={30} strokeWidth={2} />
                 )}
             </motion.button>
+
+            {/* Credits */}
+            {!isListening && (
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300 mt-2"
+                >
+                    Designed & Built by RebryCreatives
+                </motion.p>
+            )}
         </div>
     )
 }

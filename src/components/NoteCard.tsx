@@ -23,6 +23,21 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
     const [isPlaying, setIsPlaying] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    // Cancel delete confirmation on outside click
+    useEffect(() => {
+        if (!confirmDelete) return;
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+                setConfirmDelete(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [confirmDelete]);
 
     // Load hint step from localStorage
     useEffect(() => {
@@ -96,6 +111,7 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
 
     return (
         <motion.div
+            ref={cardRef}
             layout
             initial={{ opacity: 0, y: 10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

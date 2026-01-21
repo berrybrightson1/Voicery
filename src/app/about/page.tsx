@@ -60,17 +60,28 @@ export default function AboutPage() {
 
                         <div className="space-y-2">
                             <div className="flex items-baseline justify-between">
-                                <h3 className="font-bold text-lg text-gray-900">v1.1.0</h3>
+                                <h3 className="font-bold text-lg text-gray-900">v1.2.0</h3>
                                 <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-1 rounded-full">Current</span>
                             </div>
+                            <p className="text-sm text-gray-500 pb-2">Released Jan 21, 2026</p>
+
+                            <ul className="space-y-3">
+                                <PatchItem text="Voice Playback: Replay your recorded notes" />
+                                <PatchItem text="Categorization: Organize thoughts with Tags" />
+                                <PatchItem text="Recycle Bin: 1-hour recovery for deleted notes" />
+                                <PatchItem text="Refined UI: Compact horizontal action bars" />
+                                <PatchItem text="Safety: Smart delete confirmation UX" />
+                            </ul>
+                        </div>
+
+                        <div className="space-y-2 pt-4 border-t border-gray-100 opacity-60 scale-95 origin-center">
+                            <h3 className="font-bold text-lg text-gray-900">v1.1.0</h3>
                             <p className="text-sm text-gray-500 pb-2">Released Jan 21, 2026</p>
 
                             <ul className="space-y-3">
                                 <PatchItem text="1-hour note persistence (survives refresh)" />
                                 <PatchItem text="Refine button for AI-ready prompts" />
                                 <PatchItem text="Sequential onboarding hints for new users" />
-                                <PatchItem text="Tap-to-edit with explicit Save/Cancel" />
-                                <PatchItem text="Simplified About page" />
                             </ul>
                         </div>
 
@@ -90,7 +101,7 @@ export default function AboutPage() {
 
                     {/* Footer */}
                     <section className="pt-10 border-t border-gray-100 text-center">
-                        <p className="text-sm text-gray-400">Designed & Built by Gaillard.</p>
+                        <p className="text-sm text-gray-400">Designed & Built by RebryCreatives.</p>
                     </section>
 
                 </div>
