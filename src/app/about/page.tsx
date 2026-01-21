@@ -38,7 +38,7 @@ export default function AboutPage() {
                         <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                             <ul className="space-y-3 text-gray-700">
                                 <li>• Tap the mic to record</li>
-                                <li>• Notes persist for <strong>1 hour</strong>, even after refresh</li>
+                                <li>• Notes persist for <strong>20 hours</strong>, even after refresh</li>
                                 <li>• Tap text to edit, tap <strong>Clean-Up</strong> to fix grammar</li>
                             </ul>
                         </div>
@@ -70,7 +70,7 @@ export default function AboutPage() {
                                 <PatchItem text="Timestamps: Minimal time-tracking on every note" />
                                 <PatchItem text="Voice Playback: Replay your recorded notes" />
                                 <PatchItem text="Categorization: Organize thoughts with Tags" />
-                                <PatchItem text="Recycle Bin: 1-hour recovery for deleted notes" />
+                                <PatchItem text="Recycle Bin: 20-hour recovery for deleted notes" />
                             </ul>
                         </div>
 

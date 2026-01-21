@@ -46,18 +46,18 @@ interface NoteContextType {
 
 const NoteContext = createContext<NoteContextType | undefined>(undefined);
 
-const ONE_HOUR_MS = 60 * 60 * 1000;
+const EXPIRATION_MS = 20 * 60 * 60 * 1000; // 20 Hours
 const STORAGE_KEY = "voicery-notes";
 const TRASH_KEY = "voicery-trash";
 
 function filterExpired(notes: Note[]): Note[] {
     const now = Date.now();
-    return notes.filter((note) => now - note.createdAt.getTime() < ONE_HOUR_MS);
+    return notes.filter((note) => now - note.createdAt.getTime() < EXPIRATION_MS);
 }
 
 function filterExpiredTrash(trash: TrashedNote[]): TrashedNote[] {
     const now = Date.now();
-    return trash.filter((note) => now - note.deletedAt.getTime() < ONE_HOUR_MS);
+    return trash.filter((note) => now - note.deletedAt.getTime() < EXPIRATION_MS);
 }
 
 function loadNotes(): Note[] {
