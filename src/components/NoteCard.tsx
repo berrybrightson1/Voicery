@@ -171,112 +171,119 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                         {note.text}
                     </p>
 
-                    {/* Action Row */}
-                    <div className="flex items-center gap-2 mt-4">
-                        {/* Play - Only if has audio */}
-                        {note.audioData && (
-                            <button
-                                onClick={() => {
-                                    if (isPlaying && audioRef.current) {
-                                        audioRef.current.pause();
-                                        setIsPlaying(false);
-                                    } else {
-                                        if (!audioRef.current) {
-                                            audioRef.current = new Audio(note.audioData);
-                                            audioRef.current.onended = () => setIsPlaying(false);
+                    {/* Action Rows */}
+                    <div className="mt-4 space-y-2">
+                        {/* Row 1: Main actions */}
+                        <div className="flex items-center gap-2">
+                            {/* Play - Only if has audio */}
+                            {note.audioData && (
+                                <button
+                                    onClick={() => {
+                                        if (isPlaying && audioRef.current) {
+                                            audioRef.current.pause();
+                                            setIsPlaying(false);
+                                        } else {
+                                            if (!audioRef.current) {
+                                                audioRef.current = new Audio(note.audioData);
+                                                audioRef.current.onended = () => setIsPlaying(false);
+                                            }
+                                            audioRef.current.play();
+                                            setIsPlaying(true);
                                         }
-                                        audioRef.current.play();
-                                        setIsPlaying(true);
-                                    }
-                                }}
-                                className={`flex items-center justify-center h-10 w-10 rounded-xl border transition-all active:scale-95 ${isPlaying
-                                    ? "bg-blue-500 border-blue-500 text-white"
-                                    : "bg-blue-50/50 border-blue-100 text-blue-500 hover:bg-blue-100 hover:border-blue-200"
-                                    }`}
-                                aria-label={isPlaying ? "Pause" : "Play"}
-                            >
-                                {isPlaying ? <Pause size={16} strokeWidth={1.5} /> : <Play size={16} strokeWidth={1.5} />}
-                            </button>
-                        )}
+                                    }}
+                                    className={`flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium transition-all active:scale-95 ${isPlaying
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                        }`}
+                                    aria-label={isPlaying ? "Pause" : "Play"}
+                                >
+                                    {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                                    <span>{isPlaying ? "Pause" : "Play"}</span>
+                                </button>
+                            )}
 
-                        {/* Copy - Icon only */}
-                        <button
-                            onClick={handleCopy}
-                            className="flex items-center justify-center h-10 px-4 rounded-xl border bg-gray-50/50 border-gray-100 text-gray-500 hover:bg-gray-100 hover:border-gray-200 hover:text-gray-900 transition-all active:scale-95"
-                            aria-label="Copy"
-                        >
-                            <Copy size={18} strokeWidth={1.5} />
-                        </button>
-
-                        {/* Refine - Label + Icon */}
-                        <div className="relative flex-1">
+                            {/* Copy */}
                             <button
-                                onClick={handleRefine}
-                                className="flex items-center justify-center gap-2 h-10 px-4 rounded-xl border bg-purple-50/50 border-purple-100 text-purple-600 hover:bg-purple-100 hover:border-purple-200 hover:text-purple-700 transition-all active:scale-95 w-full"
-                                aria-label="Refine for AI"
+                                onClick={handleCopy}
+                                className="flex items-center justify-center h-9 w-9 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition-all active:scale-95"
+                                aria-label="Copy"
                             >
-                                <Sparkles size={16} strokeWidth={1.5} />
-                                <span className="text-sm font-medium">Refine</span>
+                                <Copy size={16} />
                             </button>
 
-                            {/* Refine Hint */}
-                            <AnimatePresence>
-                                {hintStep === 1 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 5 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 5 }}
-                                        className="absolute -bottom-14 left-0 right-0 z-10"
-                                    >
-                                        <div className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg flex items-center gap-2">
-                                            <span>✨ Tap Refine to copy as AI prompt</span>
-                                            <button
-                                                onClick={advanceHint}
-                                                className="text-gray-400 hover:text-white ml-auto"
-                                                title="Got it"
-                                            >
-                                                <X size={14} />
-                                            </button>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            {/* Refine */}
+                            <div className="relative flex-1">
+                                <button
+                                    onClick={handleRefine}
+                                    className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all active:scale-95 w-full text-sm font-medium"
+                                    aria-label="Refine for AI"
+                                >
+                                    <Sparkles size={14} />
+                                    <span>Refine</span>
+                                </button>
+
+                                {/* Refine Hint */}
+                                <AnimatePresence>
+                                    {hintStep === 1 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 5 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 5 }}
+                                            className="absolute -bottom-12 left-0 right-0 z-10"
+                                        >
+                                            <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg flex items-center gap-2">
+                                                <span>✨ Tap Refine to copy as AI prompt</span>
+                                                <button
+                                                    onClick={advanceHint}
+                                                    className="text-gray-400 hover:text-white ml-auto"
+                                                    title="Got it"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
 
-                        {/* Delete - Confirmation flow */}
-                        {confirmDelete ? (
-                            <button
-                                onClick={() => {
-                                    const deletedNote = { ...note };
-                                    deleteNote(note.id);
-                                    toast.success("Note deleted", {
-                                        action: {
-                                            label: "Undo",
-                                            onClick: () => restoreNote(deletedNote)
-                                        }
-                                    });
-                                }}
-                                className="flex items-center justify-center gap-1 h-10 px-3 rounded-xl border bg-red-500 border-red-500 text-white hover:bg-red-600 transition-all active:scale-95"
-                                aria-label="Confirm delete"
-                            >
-                                <Trash2 size={14} strokeWidth={1.5} />
-                                <span className="text-xs font-medium">Delete?</span>
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => setConfirmDelete(true)}
-                                className="flex items-center justify-center h-10 w-10 rounded-xl border bg-red-50/30 border-red-100/50 text-red-300 hover:bg-red-100/80 hover:border-red-200 hover:text-red-500 transition-all active:scale-95"
-                                aria-label="Delete"
-                            >
-                                <Trash2 size={14} strokeWidth={1.5} />
-                            </button>
-                        )}
+                        {/* Row 2: Tag + Delete */}
+                        <div className="flex items-center justify-between">
+                            {/* Tag Picker */}
+                            <TagPicker
+                                currentTag={note.tag}
+                                onSelect={(tag) => updateNoteTag(note.id, tag)}
+                            />
 
-                        {/* Tag Picker */}
-                        <TagPicker
-                            currentTag={note.tag}
-                            onSelect={(tag) => updateNoteTag(note.id, tag)}
-                        />
+                            {/* Delete */}
+                            {confirmDelete ? (
+                                <button
+                                    onClick={() => {
+                                        const deletedNote = { ...note };
+                                        deleteNote(note.id);
+                                        toast.success("Note deleted", {
+                                            action: {
+                                                label: "Undo",
+                                                onClick: () => restoreNote(deletedNote)
+                                            }
+                                        });
+                                    }}
+                                    className="flex items-center gap-1 h-8 px-3 rounded-lg bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-all active:scale-95"
+                                    aria-label="Confirm delete"
+                                >
+                                    <Trash2 size={12} />
+                                    <span>Delete?</span>
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => setConfirmDelete(true)}
+                                    className="flex items-center justify-center h-8 w-8 rounded-lg text-gray-300 hover:bg-red-50 hover:text-red-400 transition-all active:scale-95"
+                                    aria-label="Delete"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </>
             )}

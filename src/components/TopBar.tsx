@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Trash2, Info } from "lucide-react";
+import { Recycle, Info } from "lucide-react";
 import { useNotes } from "@/context/NoteContext";
 
 export function TopBar() {
@@ -23,7 +23,7 @@ export function TopBar() {
                     className="relative flex items-center justify-center w-10 h-10 text-gray-500 hover:text-gray-900 hover:bg-gray-50 rounded-full transition-all duration-200 active:scale-95"
                     aria-label="Recently deleted"
                 >
-                    <Trash2 size={22} strokeWidth={1.5} />
+                    <Recycle size={22} strokeWidth={1.5} />
                     {trash.length > 0 && (
                         <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                             {trash.length > 9 ? "9+" : trash.length}
@@ -34,4 +34,5 @@ export function TopBar() {
         </header>
     );
 }
+
 
