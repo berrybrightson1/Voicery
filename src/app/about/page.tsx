@@ -39,7 +39,7 @@ export default function AboutPage() {
                             <ul className="space-y-3 text-gray-700">
                                 <li>• Tap the mic to record</li>
                                 <li>• Notes persist for <strong>1 hour</strong>, even after refresh</li>
-                                <li>• Tap text to edit, tap <strong>Refine</strong> for AI prompts</li>
+                                <li>• Tap text to edit, tap <strong>Clean-Up</strong> to fix grammar</li>
                             </ul>
                         </div>
                     </section>
@@ -66,11 +66,11 @@ export default function AboutPage() {
                             <p className="text-sm text-gray-500 pb-2">Released Jan 21, 2026</p>
 
                             <ul className="space-y-3">
+                                <PatchItem text="Clean-Up: Smart local logic to fix transcripts" />
+                                <PatchItem text="Timestamps: Minimal time-tracking on every note" />
                                 <PatchItem text="Voice Playback: Replay your recorded notes" />
                                 <PatchItem text="Categorization: Organize thoughts with Tags" />
                                 <PatchItem text="Recycle Bin: 1-hour recovery for deleted notes" />
-                                <PatchItem text="Refined UI: Compact horizontal action bars" />
-                                <PatchItem text="Safety: Smart delete confirmation UX" />
                             </ul>
                         </div>
 

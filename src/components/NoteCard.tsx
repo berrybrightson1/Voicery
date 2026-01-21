@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, Copy, Sparkles, X, Check, Play, Pause } from "lucide-react";
+import { Trash2, Copy, Sparkles, X, Check, Play, Pause, ArrowLeft } from "lucide-react";
 import { useNotes, Note } from "@/context/NoteContext";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
@@ -21,6 +21,8 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
     const [hintStep, setHintStep] = useState<number | null>(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [originalText, setOriginalText] = useState<string | null>(null);
+    const [canRevert, setCanRevert] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const cardRef = useRef<HTMLDivElement>(null);
@@ -89,15 +91,44 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
         toast.success("Copied to clipboard");
     };
 
-    const handleRefine = () => {
-        const prompt = `Refine the following text to be clear, professional, and structured:\n\n${note.text}`;
-        navigator.clipboard.writeText(prompt);
-        toast.success("Prompt copied", {
-            description: "Paste into ChatGPT/Claude to refine."
-        });
-        // If refine hint is showing, dismiss it
-        if (hintStep === 1) {
-            advanceHint();
+    const handleCleanUp = () => {
+        const fillers = ["um", "uh", "err", "basically", "actually", "honestly", "i mean"];
+        const fillerRegex = new RegExp(`\\b(${fillers.join("|")})\\b`, "gi");
+
+        let cleaned = note.text
+            // 1. Remove specific fillers (preserving "like" as it can be functional)
+            .replace(fillerRegex, "")
+            // 2. Deduplicate words
+            .replace(/\b(\w+)\s+\1\b/gi, "$1")
+            // 3. Fix lowercase "i"
+            .replace(/\bi\b/g, "I")
+            // 4. Fix double spaces
+            .replace(/\s+/g, " ")
+            .trim();
+
+        // 5. Capitalize sentences
+        cleaned = cleaned.replace(/(^\w|[.!?]\s+\w)/g, (match) => match.toUpperCase());
+
+        if (cleaned !== note.text) {
+            setOriginalText(note.text);
+            updateNote(note.id, cleaned);
+            setCanRevert(true);
+            toast.success("Note cleaned up", {
+                description: "Fillers removed and formatting fixed."
+            });
+            // Auto-hide revert after 5 seconds
+            setTimeout(() => setCanRevert(false), 5000);
+        } else {
+            toast.info("Note is already clean!");
+        }
+    };
+
+    const handleRevert = () => {
+        if (originalText) {
+            updateNote(note.id, originalText);
+            setOriginalText(null);
+            setCanRevert(false);
+            toast.success("Reverted to original");
         }
     };
 
@@ -173,12 +204,17 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                         )}
                     </AnimatePresence>
 
-                    {/* Tag Badge */}
-                    {note.tag && (
-                        <div className="mb-2">
+                    {/* Tag Badge & Timestamp */}
+                    <div className="flex items-center justify-between mb-2">
+                        {note.tag ? (
                             <TagBadge tag={note.tag} />
-                        </div>
-                    )}
+                        ) : (
+                            <div />
+                        )}
+                        <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+                            {note.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                    </div>
 
                     <p
                         onClick={handleStartEdit}
@@ -225,16 +261,27 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                             <Copy size={14} />
                         </button>
 
-                        {/* Refine */}
+                        {/* Clean-Up / Revert */}
                         <div className="relative flex-1">
-                            <button
-                                onClick={handleRefine}
-                                className="flex items-center justify-center gap-1.5 h-9 px-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all active:scale-95 w-full text-[10px] font-bold uppercase tracking-wider border border-purple-100/50 shadow-sm"
-                                aria-label="Refine for AI"
-                            >
-                                <Sparkles size={14} />
-                                <span>Refine</span>
-                            </button>
+                            {canRevert ? (
+                                <button
+                                    onClick={handleRevert}
+                                    className="flex items-center justify-center gap-1.5 h-9 px-2 rounded-lg bg-gray-900 text-white transition-all active:scale-95 w-full text-[10px] font-bold uppercase tracking-wider shadow-md"
+                                    aria-label="Revert changes"
+                                >
+                                    <ArrowLeft size={14} />
+                                    <span>Revert</span>
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleCleanUp}
+                                    className="flex items-center justify-center gap-1.5 h-9 px-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all active:scale-95 w-full text-[10px] font-bold uppercase tracking-wider border border-purple-100/50 shadow-sm"
+                                    aria-label="Clean up text"
+                                >
+                                    <Sparkles size={14} />
+                                    <span>Clean-Up</span>
+                                </button>
+                            )}
 
                             {/* Refine Hint */}
                             <AnimatePresence>
@@ -246,7 +293,7 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                                         className="absolute -bottom-12 left-0 right-0 z-10"
                                     >
                                         <div className="bg-gray-900 text-white text-[10px] px-2 py-1.5 rounded-lg flex items-center gap-2 shadow-xl">
-                                            <span>✨ Tap Refine</span>
+                                            <span>✨ Tap Clean-Up</span>
                                             <button
                                                 onClick={advanceHint}
                                                 className="text-gray-400 hover:text-white ml-auto"
