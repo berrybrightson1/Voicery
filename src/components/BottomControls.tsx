@@ -12,9 +12,9 @@ interface BottomControlsProps {
 
 export function BottomControls({ isListening, onToggle, volume }: BottomControlsProps) {
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 pb-10 pt-6 px-6 flex flex-col items-center gap-6 z-40 max-w-md mx-auto w-full transition-all">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 pb-6 pt-4 px-6 flex flex-col items-center gap-4 z-40 max-w-md mx-auto w-full transition-all">
             { /* Visualizer */}
-            <div className="h-8 flex items-center justify-center gap-1.5 w-full max-w-[120px]">
+            <div className="h-6 flex items-center justify-center gap-1 w-full max-w-[100px]">
                 {[1, 2, 3, 4, 5].map((i) => (
                     <VisualizerBar key={i} index={i} volume={volume} isListening={isListening} />
                 ))}
@@ -24,7 +24,7 @@ export function BottomControls({ isListening, onToggle, volume }: BottomControls
                 whileTap={{ scale: 0.92 }}
                 onClick={onToggle}
                 className={cn(
-                    "w-20 h-20 rounded-[2.5rem] flex items-center justify-center text-white text-3xl shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 active:shadow-md",
+                    "w-16 h-16 rounded-[2rem] flex items-center justify-center text-white text-2xl shadow-xl transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 active:shadow-md",
                     isListening ? "bg-red-500 shadow-red-200" : "bg-gray-950 shadow-gray-200"
                 )}
                 aria-label={isListening ? "Stop recording" : "Start recording"}
@@ -34,10 +34,10 @@ export function BottomControls({ isListening, onToggle, volume }: BottomControls
                         animate={{ scale: [1, 1.15, 1] }}
                         transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
                     >
-                        <Square size={26} fill="currentColor" className="rounded-sm" strokeWidth={0} />
+                        <Square size={22} fill="currentColor" className="rounded-sm" strokeWidth={0} />
                     </motion.div>
                 ) : (
-                    <Mic size={30} strokeWidth={2} />
+                    <Mic size={26} strokeWidth={2} />
                 )}
             </motion.button>
 
@@ -46,7 +46,7 @@ export function BottomControls({ isListening, onToggle, volume }: BottomControls
                 <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-300 mt-2"
+                    className="text-[9px] font-bold uppercase tracking-[0.25em] text-gray-200 mt-1"
                 >
                     Designed & Built by RebryCreatives
                 </motion.p>
