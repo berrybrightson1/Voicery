@@ -171,91 +171,89 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                         {note.text}
                     </p>
 
-                    {/* Action Rows */}
-                    <div className="mt-4 space-y-2">
-                        {/* Row 1: Main actions */}
-                        <div className="flex items-center gap-2">
-                            {/* Play - Only if has audio */}
-                            {note.audioData && (
-                                <button
-                                    onClick={() => {
-                                        if (isPlaying && audioRef.current) {
-                                            audioRef.current.pause();
-                                            setIsPlaying(false);
-                                        } else {
-                                            if (!audioRef.current) {
-                                                audioRef.current = new Audio(note.audioData);
-                                                audioRef.current.onended = () => setIsPlaying(false);
-                                            }
-                                            audioRef.current.play();
-                                            setIsPlaying(true);
-                                        }
-                                    }}
-                                    className={`flex items-center justify-center gap-1.5 h-9 px-3 rounded-lg text-sm font-medium transition-all active:scale-95 ${isPlaying
-                                        ? "bg-blue-500 text-white"
-                                        : "bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        }`}
-                                    aria-label={isPlaying ? "Pause" : "Play"}
-                                >
-                                    {isPlaying ? <Pause size={14} /> : <Play size={14} />}
-                                    <span>{isPlaying ? "Pause" : "Play"}</span>
-                                </button>
-                            )}
-
-                            {/* Copy */}
+                    {/* Action Row */}
+                    <div className="flex items-center gap-1.5 mt-4">
+                        {/* Play - Only if has audio */}
+                        {note.audioData && (
                             <button
-                                onClick={handleCopy}
-                                className="flex items-center justify-center h-9 w-9 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 transition-all active:scale-95"
-                                aria-label="Copy"
+                                onClick={() => {
+                                    if (isPlaying && audioRef.current) {
+                                        audioRef.current.pause();
+                                        setIsPlaying(false);
+                                    } else {
+                                        if (!audioRef.current) {
+                                            audioRef.current = new Audio(note.audioData);
+                                            audioRef.current.onended = () => setIsPlaying(false);
+                                        }
+                                        audioRef.current.play();
+                                        setIsPlaying(true);
+                                    }
+                                }}
+                                className={`flex-shrink-0 flex items-center justify-center gap-1 h-9 px-2.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 ${isPlaying
+                                        ? "bg-blue-500 text-white shadow-sm"
+                                        : "bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                    }`}
+                                aria-label={isPlaying ? "Pause" : "Play"}
                             >
-                                <Copy size={16} />
+                                {isPlaying ? <Pause size={12} /> : <Play size={12} />}
+                                <span>{isPlaying ? "Pause" : "Play"}</span>
+                            </button>
+                        )}
+
+                        {/* Copy */}
+                        <button
+                            onClick={handleCopy}
+                            className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-lg bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-all active:scale-95 border border-gray-100/50"
+                            aria-label="Copy"
+                        >
+                            <Copy size={16} />
+                        </button>
+
+                        {/* Refine */}
+                        <div className="relative flex-1">
+                            <button
+                                onClick={handleRefine}
+                                className="flex items-center justify-center gap-1.5 h-9 px-2 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all active:scale-95 w-full text-[10px] font-bold uppercase tracking-wider border border-purple-100/50"
+                                aria-label="Refine for AI"
+                            >
+                                <Sparkles size={12} />
+                                <span>Refine</span>
                             </button>
 
-                            {/* Refine */}
-                            <div className="relative flex-1">
-                                <button
-                                    onClick={handleRefine}
-                                    className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-100 transition-all active:scale-95 w-full text-sm font-medium"
-                                    aria-label="Refine for AI"
-                                >
-                                    <Sparkles size={14} />
-                                    <span>Refine</span>
-                                </button>
-
-                                {/* Refine Hint */}
-                                <AnimatePresence>
-                                    {hintStep === 1 && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 5 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 5 }}
-                                            className="absolute -bottom-12 left-0 right-0 z-10"
-                                        >
-                                            <div className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg flex items-center gap-2">
-                                                <span>✨ Tap Refine to copy as AI prompt</span>
-                                                <button
-                                                    onClick={advanceHint}
-                                                    className="text-gray-400 hover:text-white ml-auto"
-                                                    title="Got it"
-                                                >
-                                                    <X size={12} />
-                                                </button>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
+                            {/* Refine Hint */}
+                            <AnimatePresence>
+                                {hintStep === 1 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 5 }}
+                                        className="absolute -bottom-12 left-0 right-0 z-10"
+                                    >
+                                        <div className="bg-gray-900 text-white text-[10px] px-2 py-1.5 rounded-lg flex items-center gap-2 shadow-xl">
+                                            <span>✨ Tap Refine</span>
+                                            <button
+                                                onClick={advanceHint}
+                                                className="text-gray-400 hover:text-white ml-auto"
+                                                title="Got it"
+                                            >
+                                                <X size={10} />
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
-                        {/* Row 2: Tag + Delete */}
-                        <div className="flex items-center justify-between">
-                            {/* Tag Picker */}
+                        {/* Tag Picker */}
+                        <div className="flex-shrink-0">
                             <TagPicker
                                 currentTag={note.tag}
                                 onSelect={(tag) => updateNoteTag(note.id, tag)}
                             />
+                        </div>
 
-                            {/* Delete */}
+                        {/* Delete */}
+                        <div className="flex-shrink-0">
                             {confirmDelete ? (
                                 <button
                                     onClick={() => {
@@ -268,7 +266,7 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                                             }
                                         });
                                     }}
-                                    className="flex items-center gap-1 h-8 px-3 rounded-lg bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-all active:scale-95"
+                                    className="flex items-center gap-1 h-9 px-2.5 rounded-lg bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-red-600 transition-all active:scale-95 shadow-sm"
                                     aria-label="Confirm delete"
                                 >
                                     <Trash2 size={12} />
@@ -277,10 +275,10 @@ export function NoteCard({ note, isFirstNote = false }: NoteCardProps) {
                             ) : (
                                 <button
                                     onClick={() => setConfirmDelete(true)}
-                                    className="flex items-center justify-center h-8 w-8 rounded-lg text-gray-300 hover:bg-red-50 hover:text-red-400 transition-all active:scale-95"
+                                    className="flex items-center justify-center h-9 w-9 rounded-lg bg-white text-gray-300 hover:bg-red-50 hover:text-red-400 border border-gray-100/50 transition-all active:scale-95"
                                     aria-label="Delete"
                                 >
-                                    <Trash2 size={14} />
+                                    <Trash2 size={16} />
                                 </button>
                             )}
                         </div>
